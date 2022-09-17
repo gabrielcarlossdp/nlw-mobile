@@ -1,7 +1,7 @@
 import { Background } from './src/components/background';
 import { StatusBar } from 'react-native';
-import { Home } from './src/screens/Home';
 import { Loading } from './src/components/Loading';
+import { Routes } from './src/routes';
 
 import {
   useFonts,
@@ -27,7 +27,7 @@ export default function App() {
         translucent
       />
 
-      {fontsLoaded ? <Home/> : <Loading/>}
+      {fontsLoaded ? <Routes/> : <Loading/>}
 
     </Background>
   );
