@@ -2,6 +2,8 @@ import { Background } from './src/components/background';
 import { StatusBar } from 'react-native';
 import { Loading } from './src/components/Loading';
 import { Routes } from './src/routes';
+import { useRef, useEffect } from 'react';
+import * as Notifications from 'expo-notifications';
 
 import {
   useFonts,
@@ -11,7 +13,37 @@ import {
   Inter_900Black
 } from '@expo-google-fonts/inter';
 
-export default function App() {  
+
+import './src/services/notificationConfigs';
+import { getPushNotificationToken } from './src/services/getPushNotificationToken';
+import { Subscription } from 'expo-modules-core';
+
+export default function App() {
+
+  const getNotificationListener = useRef<Subscription>();
+  const responseNotificationListener = useRef<Subscription>();
+
+  useEffect(() => {
+    getPushNotificationToken();
+  })
+
+  useEffect(() => {
+    getNotificationListener.current = Notifications.addNotificationReceivedListener(notification =>{
+      console.log(notification)
+    });
+
+    responseNotificationListener.current = Notifications.addNotificationResponseReceivedListener(response =>{
+      console.log(response)
+
+      return() =>{
+        if(getNotificationListener.current && responseNotificationListener.current){
+          Notifications.removeNotificationSubscription(getNotificationListener.current);
+          Notifications.removeNotificationSubscription(responseNotificationListener.current);
+        }
+      }
+    })
+  },[])
+
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
     Inter_600SemiBold,
@@ -27,7 +59,7 @@ export default function App() {
         translucent
       />
 
-      {fontsLoaded ? <Routes/> : <Loading/>}
+      {fontsLoaded ? <Routes /> : <Loading />}
 
     </Background>
   );
